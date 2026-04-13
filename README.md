@@ -11,7 +11,10 @@ SkillDelta is a modern full-stack application designed to help users track and m
 
 ![Login](./assets/login.png)
 ![Dashboard](./assets/dashboard.png)
-![Analytics](./assets/analytics.png)
+![Skills Dashboard](./assets/extra_img_1.png)
+![Recommendations](./assets/extra_img_2.png)
+![Assessment](./assets/extra_img_3.png)
+![Reminders](./assets/extra_img_4.png)
 
 ---
 
