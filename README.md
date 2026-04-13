@@ -28,47 +28,47 @@ SkillDelta is a modern full-stack application designed to help users track and m
 
 ## 🗄️ Database Design
 
-**Database:** PostgreSQL  
+**Database:** PostgreSQL (Supabase / Render)  
 **ORM:** SQLAlchemy
 
 ### Key Entities
-- **Users**: Authentication data and user profiles
-- **Skills**: User skill tracking and progression progression logic
-- **Documents**: Uploaded PDFs / OCR data for skill verification
-- **Analysis Results**: AI processed output and feedback
+- **users**: Authentication data and user profiles
+- **skills**: User skill tracking and progression metrics
+- **subtopics**: Granular topic breakdown under each skill
+- **assessments**: Skill evaluation and testing data
+- **skill_history**: Logs of historical skill adjustments and activities
+- **skill_health_history**: Tracking the decay and health of a skill over time
+- **reminders**: Automated notifications configuration
 
-### Relationships
+### Core Relationships
 - **User → Skills** (One-to-Many)
-- **User → Documents** (One-to-Many)
+- **User → Reminders** (One-to-Many)
+- **Skill → Assessments / Subtopics / History / Health** (One-to-Many)
 
-*Note: The database is designed with structured schemas and proper indexing for fast and reliable query performance.*
+*Note: The database relies on strict referential integrity with cascading deletes and efficient SQLAlchemy models.*
 
 ---
 
 ## 📡 API Endpoints Section
 
-FastAPI routes are logically structured and grouped into the following key domains:
+FastAPI routes are cleanly organized into modular domains:
 
-- **Auth APIs**: User login, registration, and JWT token management.
-- **Skill/Data APIs**: CRUD operations for skills, dynamic learning paths, and history tracking.
-- **OCR / AI APIs**: Assessment processing, recommendation engines, predictive analytics, and natural language insights via Groq.
+- **Auth & Users APIs**: Login, registration, JWT token management, and profile operations.
+- **Skill Core APIs**: CRUD operations for skills, dynamic subtopics, and dashboard aggregations.
+- **Assessment & Practice APIs**: Managing evaluation feedback and practice routines.
+- **Analytics & History APIs**: Skill analysis, growth visualization, skill health decay, and history tracking.
+- **AI & Recommendations APIs**: Machine learning predictions and personalized AI recommendations via Groq.
+- **Notifications APIs**: Management of reminders and automated alerts via APScheduler.
 
 <details>
-<summary><b>View Detailed Routes</b></summary>
+<summary><b>View Deployed Routes</b></summary>
 
-- `1️⃣ Auth`
-- `2️⃣ Skills`
-- `3️⃣ Skill Analysis`
-- `4️⃣ Recommendation`
-- `5️⃣ Growth Analytics`
-- `6️⃣ Prediction`
-- `7️⃣ Assessment`
-- `8️⃣ Practice`
-- `9️⃣ Dashboard`
-- `🔟 Reminder`
-- `11️⃣ Skill History`
-- `12️⃣ User`
-- `13️⃣ Health`
+- `/auth` & `/users`
+- `/skills` & `/dashboard`
+- `/assessment` & `/practice`
+- `/skill_history` & `/growth` & `/health`
+- `/analysis` & `/predict` & `/recommendations`
+- `/reminders`
 
 </details>
 
@@ -83,14 +83,13 @@ FastAPI routes are logically structured and grouped into the following key domai
 
 ---
 
-## ⚙️ Scalability
+## ⚙️ Scalability Architecture
 
-- **FastAPI async scalability:** High-performance asynchronous endpoints configuration for I/O bounds.
-- **PostgreSQL scaling:** Indexed structured relational schema for optimized querying.
-- **Docker deployment:** Fully containerized backend for consistent environments and simple infrastructure scaling.
-- **Future microservices architecture:** Decoupled design allows separation of Auth, Skill Mapping, and AI processing services.
-- **Redis caching:** Prepared architecture to integrate Redis for caching frequently accessed user dashboards.
-- **Load balancing:** API structure is stateless allowing easy distribution across multiple cloud instances via load balancers.
+- **FastAPI Async execution:** Asynchronous endpoints heavily utilizing `anyio` for I/O operations.
+- **PostgreSQL scaling:** Supabase and Render ready PostgreSQL with robust SQLAlchemy mapping.
+- **Background Tasks Engine:** Integrated `APScheduler` for managing scheduled asynchronous jobs like email reminders and decay evaluations without blocking the main event loop.
+- **Docker deployment:** Fully containerized backend using `Uvicorn`, deployed to Render for stable environment variables and simple infrastructure scaling.
+- **Modular Monolith Design:** Clean separation of concerns across `api/`, `services/`, and `db/` directories.
 
 ---
 
