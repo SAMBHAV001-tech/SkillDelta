@@ -173,6 +173,8 @@ def filter_skills_by_role(
         result = filter_skills_by_priority(skill_dicts, role, priority)
     else:
         result = sort_skills_by_priority(skill_dicts, role)
+        # Filter out skills that are not related to this role at all
+        result = [s for s in result if s.get("role_priority") is not None]
 
     return {
         "role":        role,
