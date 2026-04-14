@@ -3,7 +3,7 @@ import axios from "axios";
 // ── API Base URL ──────────────────────────────────────────────────────────────
 // Set VITE_API_URL in your .env.local (dev) or Vercel Environment Variables (prod)
 // Example: https://<your-hf-username>-skilldelta-backend.hf.space
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7860";
+const BASE_URL = import.meta.env.VITE_API_URL || "https://samd444-skilldelta.hf.space";
 
 const api = axios.create({
   baseURL: BASE_URL,
