@@ -1,9 +1,9 @@
 import axios from "axios";
 
 // ── API Base URL ──────────────────────────────────────────────────────────────
-// Set VITE_API_URL in your .env.local (dev) or Vercel Environment Variables (prod)
-// Example: https://<your-hf-username>-skilldelta-backend.hf.space
-const BASE_URL = import.meta.env.VITE_API_URL || "https://samd444-skilldelta.hf.space";
+// Set VITE_API_URL in .env.local (dev) or Vercel Environment Variables (prod)
+export const BASE_URL =
+  import.meta.env.VITE_API_URL || "https://samd444-skilldelta.hf.space";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -13,18 +13,18 @@ const api = axios.create({
 // Attach token automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle expired tokens
+// Handle expired tokens globally
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Only redirect if it's a 401 and NOT from the login endpoint
-    if (err.response?.status === 401 && !err.config.url.includes("/auth/login")) {
+    if (
+      err.response?.status === 401 &&
+      !err.config.url.includes("/auth/login")
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user_id");
       window.location.href = "/";
@@ -34,16 +34,16 @@ api.interceptors.response.use(
 );
 
 /**
- * Fire-and-forget backend wake call.
- * Call this once on app mount so the HF Space is warm
- * before the user interacts with the login form.
+ * Aggressive multi-ping warm-up.
+ * Fires 3 bare fetch() pings — now, 8 s, 16 s — so the HF Space
+ * receives multiple hits the moment the app loads.
+ * Uses bare fetch so there is zero axios overhead / no CORS preflight.
  */
-export const wakeBackend = async () => {
-  try {
-    await fetch(`${BASE_URL}/health/ping`);
-  } catch (_) {
-    // Silently ignore — server may still be starting
-  }
+export const wakeBackend = () => {
+  const ping = () => fetch(`${BASE_URL}/health/ping`).catch(() => {});
+  ping();                        // immediate
+  setTimeout(ping, 8_000);      // 8 s
+  setTimeout(ping, 16_000);     // 16 s
 };
 
 export default api;
