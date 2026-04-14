@@ -41,7 +41,7 @@ export default function Login() {
   useEffect(() => {
     cancelledRef.current = false;
     let attempt = 0;
-    const MAX_ATTEMPTS  = 25;   // ~38 s max wait
+    const MAX_ATTEMPTS  = 10;   // ~15 s max wait
     const POLL_INTERVAL = 1500; // 1.5 s between pings
 
     const showWaking = () => {
@@ -164,7 +164,7 @@ export default function Login() {
           <div className="mt-3 h-1 w-full bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full bg-orange-400 rounded-full transition-all duration-1000"
-              style={{ width: `${Math.min(100, (elapsed / 38) * 100)}%` }}
+              style={{ width: `${Math.min(100, (elapsed / 15) * 100)}%` }}
             />
           </div>
         </div>

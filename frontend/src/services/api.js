@@ -1,9 +1,8 @@
 import axios from "axios";
 
 // ── API Base URL ──────────────────────────────────────────────────────────────
-// Set VITE_API_URL in .env.local (dev) or Vercel Environment Variables (prod)
-export const BASE_URL =
-  import.meta.env.VITE_API_URL || "https://samd444-skilldelta.hf.space";
+// Hardcoded to Hugging Face to override any old Render variables in Vercel!
+export const BASE_URL = "https://samd444-skilldelta.hf.space";
 
 const api = axios.create({
   baseURL: BASE_URL,
