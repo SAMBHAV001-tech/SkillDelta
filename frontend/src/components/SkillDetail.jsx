@@ -208,8 +208,15 @@ export default function SkillDetail() {
                       className="block p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 outline-none focus:ring-2 focus:ring-orange-500 transition-all hover:scale-[1.02] duration-300 shadow-sm"
                     >
                       <div className="flex items-start mb-2">
-                        <span className="text-2xl mr-3 leading-none">
-                          {res.type === "video" ? "🎥" : "📚"}
+                        <span className="mr-3 leading-none flex-shrink-0">
+                          {res.type === "video" ? (
+                            <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <rect width="28" height="20" rx="5" fill="#FF0000"/>
+                              <path d="M11.5 6L19 10L11.5 14V6Z" fill="white"/>
+                            </svg>
+                          ) : (
+                            <span className="text-2xl">📚</span>
+                          )}
                         </span>
                         <h5 className="font-semibold text-orange-300 line-clamp-2 leading-tight flex-1">
                           {res.title}
@@ -217,7 +224,13 @@ export default function SkillDetail() {
                       </div>
 
                       {res.type === "video" ? (
-                        <p className="text-sm text-orange-400 opacity-80 mt-2 font-medium">📺 {res.channel}</p>
+                        <p className="text-sm text-orange-400 opacity-80 mt-2 font-medium flex items-center gap-1.5">
+                          <svg width="18" height="13" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
+                            <rect width="28" height="20" rx="5" fill="#FF0000"/>
+                            <path d="M11.5 6L19 10L11.5 14V6Z" fill="white"/>
+                          </svg>
+                          {res.channel}
+                        </p>
                       ) : (
                         <p className="text-xs opacity-70 mt-2 line-clamp-3 leading-relaxed">
                           {res.summary}
