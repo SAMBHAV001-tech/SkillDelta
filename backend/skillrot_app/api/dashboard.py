@@ -10,6 +10,7 @@ from skillrot_app.models.reminder import Reminder
 from skillrot_app.models.skill_health_history import SkillHealthHistory
 from skillrot_app.services.decay_service import recalculate_skill_decay
 from skillrot_app.core.skill_analyzer import classify_skill
+from skillrot_app.core.decay_engine import compute_decay_score
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
@@ -82,7 +83,18 @@ def get_user_dashboard(user_id: int, db: Session = Depends(get_db)):
             if days_since > 0:
                  health = max(0, health - (days_since * 0.5)) 
         else:
-            health = 100.0 # Default starting health
+            # No health history yet — compute actual decay from learned_date
+            # so newly added skills show real health instead of 100%
+            days_since_learned = (today - skill.learned_date).days
+            level = skill.level.lower() if skill.level else "beginner"
+            health = compute_decay_score(
+                days_since_last_record=0,
+                days_since_learned=days_since_learned,
+                usage_frequency=0,
+                skill_level=level,
+                previous_health=None,
+                sessions_today=0
+            )
             
         health = round(health, 2)
         status = classify_skill(health)
