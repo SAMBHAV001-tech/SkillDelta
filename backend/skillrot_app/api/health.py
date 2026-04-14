@@ -6,7 +6,7 @@ from skillrot_app.db.database import get_db
 router = APIRouter(prefix="/health", tags=["Health"])
 
 
-@router.get("/ping")
+@router.api_route("/ping", methods=["GET", "HEAD"])
 def health_ping():
     """
     Lightweight liveness check — no DB call.
