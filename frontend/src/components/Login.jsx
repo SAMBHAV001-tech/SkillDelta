@@ -140,6 +140,11 @@ export default function Login() {
     }
   };
 
+
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#13141c] font-sans p-6 text-gray-100">
+
       <style>{`
         @keyframes slideDownFade { 
           from { opacity: 0; transform: translateY(-20px) translateX(-50%); } 
