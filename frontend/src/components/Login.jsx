@@ -37,6 +37,8 @@ export default function Login() {
   const pollTimerRef                = useRef(null);
   const elapsedTimerRef             = useRef(null);
 
+  const [showToast, setShowToast] = useState(true);
+
   // ─── Rapid health poller ────────────────────────────────────────────────────
   useEffect(() => {
     cancelledRef.current = false;
@@ -66,6 +68,7 @@ export default function Login() {
         clearTimeout(wakingTimeout);
         clearInterval(elapsedTimerRef.current);
         setStatus(STATUS.READY);
+        setTimeout(() => setShowToast(false), 2500); // fade out shortly after ready
         return;
       }
 
@@ -75,6 +78,7 @@ export default function Login() {
         clearTimeout(wakingTimeout);
         clearInterval(elapsedTimerRef.current);
         setStatus(STATUS.READY);
+        setTimeout(() => setShowToast(false), 2500);
         return;
       }
 
@@ -136,78 +140,60 @@ export default function Login() {
     }
   };
 
-  // ─── Status banner ──────────────────────────────────────────────────────────
-  const StatusBanner = () => {
-    if (status === STATUS.CHECKING)
-      return (
-        <div className="mb-5 p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-300 text-sm flex items-center gap-3">
-          <Spinner color="text-orange-400" />
-          <span className="font-medium">Connecting to server…</span>
-        </div>
-      );
-
-    if (status === STATUS.WAKING)
-      return (
-        <div className="mb-5 p-3 bg-orange-500/10 border border-orange-500/30 rounded-2xl text-sm">
+      <style>{`
+        @keyframes slideDownFade { 
+          from { opacity: 0; transform: translateY(-20px) translateX(-50%); } 
+          to { opacity: 1; transform: translateY(0) translateX(-50%); } 
+        }
+        @keyframes fadeOutUp {
+          from { opacity: 1; transform: translateY(0) translateX(-50%); }
+          to { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+        }
+      `}</style>
+      
+      {showToast && status !== STATUS.READY && (
+        <div 
+          className="fixed left-1/2 z-[9999] w-[90%] max-w-md p-4 bg-orange-500/10 border border-orange-500/30 backdrop-blur-xl rounded-2xl shadow-2xl"
+          style={{
+            top: '1.5rem',
+            transform: 'translateX(-50%)',
+            animation: 'slideDownFade 0.4s ease-out forwards',
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(251,146,60,0.15)"
+          }}
+        >
           <div className="flex items-center gap-3">
-            <Spinner color="text-orange-400" />
+            <Spinner color="text-orange-400" size="w-6 h-6" />
             <div>
-              <p className="font-bold text-orange-400 leading-tight">
-                Waking up server… ({elapsed}s)
+              <p className="font-bold text-orange-400 text-base leading-tight">
+                {status === STATUS.WAKING ? `Waking up server… (${elapsed}s)` : "Connecting to server..."}
               </p>
-              <p className="text-orange-300/75 text-xs mt-0.5">
-                Fill in your details — the button unlocks automatically.
+              <p className="text-orange-300/80 text-xs mt-1 font-medium">
+                Please wait a moment. You can fill in your details while the server starts.
               </p>
             </div>
           </div>
-          {/* Thin animated progress bar */}
-          <div className="mt-3 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-orange-400 rounded-full transition-all duration-1000"
-              style={{ width: `${Math.min(100, (elapsed / 15) * 100)}%` }}
-            />
-          </div>
+          {status === STATUS.WAKING && (
+             <div className="mt-3 w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+               <div 
+                 className="bg-orange-400 h-1.5 rounded-full transition-all duration-1000 ease-linear" 
+                 style={{ width: `${Math.min(100, (elapsed / 15) * 100)}%` }} 
+               ></div>
+             </div>
+          )}
         </div>
-      );
-
-    return (
-      <div className="mb-5 p-3 bg-green-500/10 border border-green-500/30 rounded-xl text-green-400 text-xs font-semibold flex items-center gap-2">
-        <span className="text-green-400 text-base">●</span>
-        Server online — you&apos;re good to go!
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#13141c] font-sans p-6 text-gray-100">
-
-      {/* ⚡ Top slim warming banner — auto hides when ready */}
-      {status !== STATUS.READY && (
-        <style>{`
-          @keyframes sd-slide-in { from { opacity:0; transform:translateY(-8px) translateX(-50%) } to { opacity:1; transform:translateY(0) translateX(-50%) } }
-          @keyframes sd-glow { 0%,100%{text-shadow:0 0 8px rgba(251,146,60,.6)} 50%{text-shadow:0 0 18px rgba(251,146,60,.9)} }
-          .sd-banner { animation: sd-slide-in .35s ease, sd-glow 2s ease-in-out infinite; }
-        `}</style>
       )}
-      {status !== STATUS.READY && (
-        <div
-          className="sd-banner"
+      
+      {showToast && status === STATUS.READY && (
+        <div 
+          className="fixed left-1/2 z-[9999] px-6 py-3 bg-green-500/10 border border-green-500/30 backdrop-blur-xl rounded-full shadow-2xl flex items-center gap-2"
           style={{
-            position:"fixed", top:"1.1rem", left:"50%",
-            transform:"translateX(-50%)", zIndex:9999,
-            display:"flex", alignItems:"center", gap:".5rem",
-            background:"rgba(28,29,39,.93)",
-            border:"1px solid rgba(251,146,60,.35)",
-            borderRadius:"9999px", padding:".45rem 1.1rem",
-            backdropFilter:"blur(10px)",
-            boxShadow:"0 4px 20px rgba(0,0,0,.35),0 0 10px rgba(251,146,60,.12)",
-            whiteSpace:"nowrap",
+            top: '1.5rem',
+            transform: 'translateX(-50%)',
+            animation: 'slideDownFade 0.3s ease-out forwards, fadeOutUp 0.5s ease-in 2s forwards',
           }}
         >
-          <Spinner color="text-orange-400" size="h-3.5 w-3.5" />
-          <span style={{fontSize:".75rem", fontWeight:600, color:"rgb(251,146,60)"}}>
-            Warming up SkillDelta… fill in your details below
-          </span>
+          <span className="text-green-400 font-bold text-lg leading-none">●</span>
+          <span className="text-green-400 font-semibold text-sm">Server Connected!</span>
         </div>
       )}
 
@@ -227,8 +213,7 @@ export default function Login() {
               Track Your Skill Growth
             </p>
 
-            {/* Server status */}
-            <StatusBanner />
+
 
             <h2 className="text-2xl font-bold text-white mb-6 text-center md:text-left">
               {mode === "login" ? "Welcome Back" : "Create Account"}
