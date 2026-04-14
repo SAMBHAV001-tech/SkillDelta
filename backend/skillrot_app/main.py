@@ -1,9 +1,12 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from skillrot_app.core.config import settings
 from skillrot_app.core.logging import setup_logging
 from skillrot_app.core.exceptions import global_exception_handler
 from skillrot_app.core.scheduler import start_scheduler
+from skillrot_app.core.keep_alive import self_ping_loop
 
+import asyncio
 import logging
 
 # 🔹 Import routers in desired logical order
@@ -46,10 +49,34 @@ print("EMAIL LOADED:", os.getenv("EMAIL_ADDRESS"))
 setup_logging()
 logger = logging.getLogger(__name__)
 
+# =========================================================
+# 🔹 LIFESPAN (startup + shutdown + keep-alive)
+# =========================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── Startup ──────────────────────────────────────────
+    logger.info("SkillDelta backend starting up...")
+    check_db_connection()
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables ensured.")
+    start_scheduler()
+
+    # Launch self-ping keep-alive as background task
+    ping_task = asyncio.create_task(self_ping_loop())
+
+    yield  # ← app is running
+
+    # ── Shutdown ─────────────────────────────────────────
+    ping_task.cancel()
+    logger.info("SkillDelta backend shutting down...")
+
+
 # ✅ Create FastAPI app
 app = FastAPI(
     title=settings.APP_NAME,
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -58,9 +85,11 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://skilldelta.netlify.app",      # if you host frontend
-        "https://skilldelta.vercel.app",       # if hosted on vercel
         "http://127.0.0.1:5173",
+        "https://skilldelta.netlify.app",
+        "https://skilldelta.vercel.app",
+        # ✅ Hugging Face Spaces
+        "https://samd444-skilldelta.hf.space",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -89,21 +118,8 @@ app.include_router(health_router)          # 13️⃣ Health
 app.include_router(role_filter_router)
 
 # =========================================================
-# 🔹 STARTUP / SHUTDOWN
+# 🔹 STARTUP / SHUTDOWN — handled by lifespan() above
 # =========================================================
-
-@app.on_event("startup")
-def startup_event():
-    logger.info("SkillDelta backend starting up...")
-    check_db_connection()
-    Base.metadata.create_all(bind=engine)
-    logger.info("Database tables ensured.")
-    start_scheduler()
-
-
-@app.on_event("shutdown")
-def shutdown_event():
-    logger.info("SkillDelta backend shutting down...")
 
 
 # =========================================================
@@ -112,16 +128,18 @@ def shutdown_event():
 
 @app.get("/")
 def root():
-    db_type = "Unknown DB"
-
-    if "supabase" in settings.DATABASE_URL:
+    db_url = settings.DATABASE_URL or ""
+    if "supabase" in db_url:
         db_type = "Supabase PostgreSQL"
-    elif "render" in settings.DATABASE_URL:
-        db_type = "Render PostgreSQL"
-    elif "localhost" in settings.DATABASE_URL:
+    elif "localhost" in db_url or "127.0.0.1" in db_url:
         db_type = "Local PostgreSQL"
+    elif db_url:
+        db_type = "Cloud PostgreSQL"
+    else:
+        db_type = "Unknown DB"
 
     return {
         "message": "SkillDelta backend running",
+        "platform": "Hugging Face Spaces",
         "database": db_type
     }

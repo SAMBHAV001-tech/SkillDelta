@@ -23,6 +23,13 @@ export default function Login() {
   const wakeTimerRef = useRef(null);
   const pollRef = useRef(null);
 
+  // ⚡ Warming banner (auto-hides after 10s)
+  const [showBanner, setShowBanner] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowBanner(false), 10000);
+    return () => clearTimeout(t);
+  }, []);
+
   // ─── Proactive server health check on page load ───────────────────────────
   useEffect(() => {
     let attempt = 0;
@@ -30,7 +37,8 @@ export default function Login() {
 
     const checkHealth = async () => {
       try {
-        const res = await api.get("/health/", { timeout: 8000 });
+        // Use /health/ping — lightweight check with no DB dependency
+        const res = await api.get("/health/ping", { timeout: 8000 });
         if (!cancelled && res.data?.status === "ok") {
           setServerStatus(SERVER_STATUS.READY);
           clearInterval(wakeTimerRef.current);
@@ -134,6 +142,52 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#13141c] font-sans p-6 text-gray-100">
 
+      {/* ⚡ Warming banner — keyframe injected inline once */}
+      <style>{`
+        @keyframes sd-glow-pulse {
+          0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(251,146,60,0.6); }
+          50%       { opacity: 0.65; text-shadow: 0 0 18px rgba(251,146,60,0.9); }
+        }
+        .sd-glow-text {
+          animation: sd-glow-pulse 2s ease-in-out infinite;
+        }
+      `}</style>
+
+      {showBanner && (
+        <div
+          style={{
+            position: "fixed",
+            top: "1.25rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "0.6rem",
+            background: "rgba(28,29,39,0.92)",
+            border: "1px solid rgba(251,146,60,0.35)",
+            borderRadius: "9999px",
+            padding: "0.55rem 1.25rem",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.4), 0 0 12px rgba(251,146,60,0.15)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span style={{ fontSize: "1rem" }}>⚡</span>
+          <span
+            className="sd-glow-text"
+            style={{
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              color: "rgb(251,146,60)",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Warming up SkillDelta&hellip; first response may take a few seconds
+          </span>
+        </div>
+      )}
+
       {/* Main Split Container */}
       <div className="flex flex-col md:flex-row bg-[#1c1d27] rounded-[2rem] shadow-2xl overflow-hidden w-full max-w-5xl md:h-[620px] border border-white/5">
 
@@ -172,7 +226,7 @@ export default function Login() {
                   <span className="font-bold text-orange-400">Waking up server...</span>
                 </div>
                 <p className="text-orange-300/80 text-xs leading-relaxed pl-8">
-                  Our backend is starting up on free hosting. This takes <strong>30–45 seconds</strong> on first visit. The form will unlock automatically — no action needed! <span className="text-orange-400 font-semibold">({estimateText()})</span>
+                  Our backend is waking up. Please wait a moment while it initializes. The form will unlock automatically — no action needed! <span className="text-orange-400 font-semibold">({estimateText()})</span>
                 </p>
                 {/* Animated progress dots */}
                 <div className="flex items-center gap-1 mt-3 pl-8">

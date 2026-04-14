@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { wakeBackend } from "./services/api";
 import AuthProvider from "./context/AuthContext";
 
 import Login from "./components/Login";
@@ -13,6 +15,11 @@ import SkillHistory from "./pages/SkillHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
+  // 🔥 Proactively wake the backend on first load
+  useEffect(() => {
+    wakeBackend();
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>

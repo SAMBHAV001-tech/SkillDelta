@@ -3,6 +3,7 @@
 SkillDelta is a modern full-stack application designed to help users track and manage skill development over time. It features a personalized dashboard that provides insights into learning progress with an intuitive, visually appealing interface.
 
 **Live Demo:** [https://skilldelta.vercel.app](https://skilldelta.vercel.app)  
+**Backend API:** *(Hugging Face Spaces — link to be updated after deployment)*  
 **Repository:** [SAMBHAV001-tech/SkillDelta](https://github.com/SAMBHAV001-tech/SkillDelta)
 
 ---
@@ -22,13 +23,13 @@ SkillDelta is a modern full-stack application designed to help users track and m
 - **Frontend:** React 19, Vite, Tailwind CSS, Recharts
 - **Backend:** FastAPI, Python 3.13, PostgreSQL (SQLAlchemy)
 - **Document Processing & AI:** PyTesseract (OCR), PDFPlumber, Groq API
-- **Deployment:** Vercel (Frontend), Docker + Render.com (Backend)
+- **Deployment:** Vercel (Frontend), Docker + Hugging Face Spaces (Backend)
 
 ---
 
 ## 🗄️ Database Design
 
-**Database:** PostgreSQL (Supabase / Render)  
+**Database:** PostgreSQL (Supabase)  
 **ORM:** SQLAlchemy
 
 ### Key Entities
@@ -88,7 +89,7 @@ FastAPI routes are cleanly organized into modular domains:
 - **FastAPI Async execution:** Asynchronous endpoints heavily utilizing `anyio` for I/O operations.
 - **PostgreSQL scaling:** Supabase and Render ready PostgreSQL with robust SQLAlchemy mapping.
 - **Background Tasks Engine:** Integrated `APScheduler` for managing scheduled asynchronous jobs like email reminders and decay evaluations without blocking the main event loop.
-- **Docker deployment:** Fully containerized backend using `Uvicorn`, deployed to Render for stable environment variables and simple infrastructure scaling.
+- **Docker deployment:** Fully containerized backend using `Uvicorn`, deployed to Hugging Face Spaces for stable environment variables and simple infrastructure scaling.
 - **Modular Monolith Design:** Clean separation of concerns across `api/`, `services/`, and `db/` directories.
 
 ---
