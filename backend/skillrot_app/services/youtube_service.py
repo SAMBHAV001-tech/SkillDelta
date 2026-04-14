@@ -101,7 +101,30 @@ def fetch_youtube_videos(query: str, skill_name: str = None, max_results: int = 
         data = response.json()
         results = []
 
-        for item in data.get("items", []):
+        items = data.get("items", [])[:3]
+
+        # 🔹 Extract unique channel IDs to fetch logos in bulk
+        channel_ids = list({item.get("snippet", {}).get("channelId") for item in items if item.get("snippet", {}).get("channelId")})
+        
+        channel_logos = {}
+        if channel_ids:
+            try:
+                channel_resp = requests.get(
+                    "https://www.googleapis.com/youtube/v3/channels",
+                    params={
+                        "part": "snippet",
+                        "id": ",".join(channel_ids),
+                        "key": YOUTUBE_API_KEY
+                    },
+                    timeout=5
+                )
+                if channel_resp.status_code == 200:
+                    for c_item in channel_resp.json().get("items", []):
+                        channel_logos[c_item["id"]] = c_item.get("snippet", {}).get("thumbnails", {}).get("default", {}).get("url")
+            except Exception as e:
+                print("Could not fetch channel logos:", e)
+
+        for item in items:
             video_id = item.get("id", {}).get("videoId")
             snippet = item.get("snippet", {})
 
@@ -112,6 +135,7 @@ def fetch_youtube_videos(query: str, skill_name: str = None, max_results: int = 
                 "title": snippet.get("title"),
                 "url": f"https://www.youtube.com/watch?v={video_id}",
                 "channel": snippet.get("channelTitle"),
+                "channel_logo": channel_logos.get(snippet.get("channelId")),
                 "type": "video"
             })
 

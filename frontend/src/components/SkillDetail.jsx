@@ -224,13 +224,19 @@ export default function SkillDetail() {
                       </div>
 
                       {res.type === "video" ? (
-                        <p className="text-sm text-orange-400 opacity-80 mt-2 font-medium flex items-center gap-1.5">
-                          <svg width="18" height="13" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
-                            <rect width="28" height="20" rx="5" fill="#FF0000"/>
-                            <path d="M11.5 6L19 10L11.5 14V6Z" fill="white"/>
-                          </svg>
-                          {res.channel}
-                        </p>
+                        <div className="mt-2 flex items-center gap-1.5 opacity-80 transition-opacity hover:opacity-100">
+                          {res.channel_logo ? (
+                            <img src={res.channel_logo} alt={res.channel} className="w-5 h-5 rounded-full object-cover shadow-sm bg-black/20" />
+                          ) : (
+                            <svg width="18" height="13" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block flex-shrink-0">
+                              <rect width="28" height="20" rx="5" fill="#FF0000"/>
+                              <path d="M11.5 6L19 10L11.5 14V6Z" fill="white"/>
+                            </svg>
+                          )}
+                          <p className="text-sm text-orange-400 font-medium">
+                            {res.channel}
+                          </p>
+                        </div>
                       ) : (
                         <p className="text-xs opacity-70 mt-2 line-clamp-3 leading-relaxed">
                           {res.summary}
