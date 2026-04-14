@@ -3,7 +3,7 @@
 SkillDelta is a modern full-stack application designed to help users track and manage skill development over time. It features a personalized dashboard that provides insights into learning progress with an intuitive, visually appealing interface.
 
 **Live Demo:** [https://skilldelta.vercel.app](https://skilldelta.vercel.app)  
-**Backend API:** *(Hugging Face Spaces — link to be updated after deployment)*  
+**Backend API:** [https://samd444-skilldelta.hf.space](https://samd444-skilldelta.hf.space)  
 **Repository:** [SAMBHAV001-tech/SkillDelta](https://github.com/SAMBHAV001-tech/SkillDelta)
 
 ---
