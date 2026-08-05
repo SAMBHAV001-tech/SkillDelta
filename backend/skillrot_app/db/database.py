@@ -8,7 +8,7 @@ from skillrot_app.models.base import Base
 # Load .env
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 print("DATABASE URL USED:", DATABASE_URL)
 
